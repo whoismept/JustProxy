@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Main Shield (Solid White) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,20 L30,30 L30,55 C30,72 42,88 54,92 C66,88 78,72 78,55 L78,30 L54,20 Z" />
+
+    <!-- Connection / Proxy Symbol (Lightning + Link) -->
+    <path
+        android:strokeColor="#4A148C"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M45,45 L63,63 M45,63 L63,45" />
+
+    <path
+        android:strokeColor="#03DAC6"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M54,40 L54,68 M40,54 L68,54" />
+
+    <!-- Center Dot -->
+    <path
+        android:fillColor="#03DAC6"
+        android:pathData="M54,54m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+
+</vector>
