@@ -30,7 +30,7 @@ Supports both **Root** (iptables) and **VPN** (no-root) interception modes with 
 
 ## Screenshots
 
-> *Add screenshots here*
+<img src="screenshots/app.png" width="320" alt="Profiles screen" />
 
 ---
 
