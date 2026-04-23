@@ -27,7 +27,7 @@ object PacketBuilder {
         pkt[10] = 0; pkt[11] = 0     // checksum placeholder
         srcIp.copyInto(pkt, 12)
         dstIp.copyInto(pkt, 16)
-        val ipCsum = checksum(pkt, 0, ipLen)
+        val ipCsum = checksum(pkt, ipLen)
         pkt[10] = (ipCsum shr 8).toByte()
         pkt[11] = (ipCsum and 0xFF).toByte()
 
@@ -61,15 +61,14 @@ object PacketBuilder {
         return pkt
     }
 
-    private fun checksum(data: ByteArray, offset: Int, length: Int): Int {
+    private fun checksum(data: ByteArray, length: Int): Int {
         var sum = 0
-        var i = offset
-        val end = offset + length
-        while (i < end - 1) {
+        var i = 0
+        while (i < length - 1) {
             sum += ((data[i].toInt() and 0xFF) shl 8) or (data[i + 1].toInt() and 0xFF)
             i += 2
         }
-        if (i < end) sum += (data[i].toInt() and 0xFF) shl 8
+        if (i < length) sum += (data[i].toInt() and 0xFF) shl 8
         while (sum shr 16 != 0) sum = (sum and 0xFFFF) + (sum shr 16)
         return sum.inv() and 0xFFFF
     }
@@ -87,6 +86,6 @@ object PacketBuilder {
         // zero out checksum field in pseudo copy
         pseudo[12 + 16] = 0
         pseudo[12 + 17] = 0
-        return checksum(pseudo, 0, pseudo.size)
+        return checksum(pseudo, pseudo.size)
     }
 }

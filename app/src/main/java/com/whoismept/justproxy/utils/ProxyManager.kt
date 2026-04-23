@@ -11,13 +11,13 @@ object ProxyManager {
     fun startProxy(context: Context, profile: ProxyProfile): Boolean {
         stopProxy()
         return if (profile.type == ProxyType.HTTP && profile.isHttp && profile.targetPackages.isNullOrBlank()) {
-            startSystemProxy(profile)
+            startSystemProxy()
         } else {
             startIptablesProxy(context, profile)
         }
     }
 
-    private fun startSystemProxy(profile: ProxyProfile): Boolean {
+    private fun startSystemProxy(): Boolean {
         // Route through the local relay so connections appear in Traffic Log.
         // The relay intercepts at 127.0.0.1:RELAY_PORT and forwards to the real Burp endpoint.
         val relayHost = "127.0.0.1"

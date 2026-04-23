@@ -1,3 +1,4 @@
+@file:Suppress("BlockingMethodInNonBlockingContext")
 package com.whoismept.justproxy.service
 
 import android.util.Log
@@ -13,8 +14,7 @@ import java.net.Socket
 
 private const val TAG = "LocalProxyRelay"
 
-private const val TLS_ALERT     = 0x15.toByte()
-private const val TLS_HANDSHAKE = 0x16.toByte()
+private const val TLS_ALERT = 0x15.toByte()
 
 // Synthetic TLS fatal alert: certificate_unknown (46)
 // Sent to Burp when the app closes the socket without a proper TLS Alert,

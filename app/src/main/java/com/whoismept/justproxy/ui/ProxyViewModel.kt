@@ -1,5 +1,6 @@
 package com.whoismept.justproxy.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
@@ -41,6 +42,7 @@ class ProxyViewModel(private val repository: ProxyRepository) : ViewModel() {
     // Cache key: avoid re-scanning the package list unless showSystemApps changes.
     private var lastShowSystemApps: Boolean? = null
 
+    @SuppressLint("QueryPermissionsNeeded")
     fun loadInstalledApps(context: Context, showSystemApps: Boolean) {
         if (showSystemApps == lastShowSystemApps && _installedApps.value.isNotEmpty()) return
         lastShowSystemApps = showSystemApps

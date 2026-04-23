@@ -1,9 +1,11 @@
 package com.whoismept.justproxy.service
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.net.VpnService
 import android.os.Build
 import android.os.ParcelFileDescriptor
@@ -17,6 +19,7 @@ import java.io.FileOutputStream
 
 private const val TAG = "ProxyVpnService"
 
+@SuppressLint("VpnPermission")
 class ProxyVpnService : VpnService(), Runnable {
 
     private var vpnInterface: ParcelFileDescriptor? = null
@@ -93,7 +96,7 @@ class ProxyVpnService : VpnService(), Runnable {
                 if (n > 0) connectionManager?.handlePacket(buffer, n)
             }
 
-        } catch (e: InterruptedException) {
+        } catch (_: InterruptedException) {
             Log.i(TAG, "VPN thread interrupted")
         } catch (e: Exception) {
             Log.e(TAG, "VPN loop error", e)
@@ -109,9 +112,7 @@ class ProxyVpnService : VpnService(), Runnable {
         runCatching { vpnInterface?.close() }
         vpnInterface = null
         vpnThread = null
-        @Suppress("DEPRECATION")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) stopForeground(STOP_FOREGROUND_REMOVE)
-        else stopForeground(true)
+        stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
 
@@ -147,6 +148,10 @@ class ProxyVpnService : VpnService(), Runnable {
             .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Stop", stopIntent)
             .build()
 
-        startForeground(NOTIFICATION_ID, notification)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+        } else {
+            startForeground(NOTIFICATION_ID, notification)
+        }
     }
 }

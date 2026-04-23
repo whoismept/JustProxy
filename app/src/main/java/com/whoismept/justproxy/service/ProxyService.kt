@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.IBinder
 import android.os.SystemClock
 import androidx.core.app.NotificationCompat
+import androidx.core.content.edit
 import com.whoismept.justproxy.MainActivity
 import com.whoismept.justproxy.data.ProxyProfile
 import com.whoismept.justproxy.data.ProxyType
@@ -136,33 +137,27 @@ class ProxyService : Service() {
         relay?.stop()
         relay = null
         ProxyManager.stopProxy()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-        } else {
-            @Suppress("DEPRECATION")
-            stopForeground(true)
-        }
+        stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
 
     // ── State persistence — survives START_STICKY restarts ────────────────────
 
     private fun saveProxyState(profile: ProxyProfile, persistent: Boolean) {
-        getSharedPreferences(PREFS_STATE, MODE_PRIVATE).edit().apply {
-            putInt("profile_id",       profile.id)
-            putString("profile_name",  profile.name)
-            putString("profile_host",  profile.host)
-            putInt("profile_port",     profile.port)
-            putString("profile_type",  profile.type.name)
+        getSharedPreferences(PREFS_STATE, MODE_PRIVATE).edit {
+            putInt("profile_id",          profile.id)
+            putString("profile_name",     profile.name)
+            putString("profile_host",     profile.host)
+            putInt("profile_port",        profile.port)
+            putString("profile_type",     profile.type.name)
             putBoolean("profile_is_http", profile.isHttp)
             putString("profile_packages", profile.targetPackages)
-            putBoolean("persistent",   persistent)
-            apply()
+            putBoolean("persistent",      persistent)
         }
     }
 
     private fun clearProxyState() {
-        getSharedPreferences(PREFS_STATE, MODE_PRIVATE).edit().clear().apply()
+        getSharedPreferences(PREFS_STATE, MODE_PRIVATE).edit { clear() }
     }
 
     private fun restoreProxyState() {

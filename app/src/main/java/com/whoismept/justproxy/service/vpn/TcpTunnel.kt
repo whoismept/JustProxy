@@ -1,3 +1,4 @@
+@file:Suppress("BlockingMethodInNonBlockingContext")
 package com.whoismept.justproxy.service.vpn
 
 import android.net.VpnService

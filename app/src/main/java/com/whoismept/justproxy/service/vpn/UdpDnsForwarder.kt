@@ -57,7 +57,6 @@ class UdpDnsForwarder(
             val response = respBuf.copyOf(respPacket.length)
             val pkt = buildUdpIpPacket(
                 srcIp   = InetAddress.getByName(dnsServer).address,
-                srcPort = DNS_PORT,
                 dstIp   = clientIp,
                 dstPort = clientPort,
                 payload = response
@@ -72,7 +71,7 @@ class UdpDnsForwarder(
     // ── packet builder ────────────────────────────────────────────────────────
 
     private fun buildUdpIpPacket(
-        srcIp: ByteArray, srcPort: Int,
+        srcIp: ByteArray,
         dstIp: ByteArray, dstPort: Int,
         payload: ByteArray
     ): ByteArray {
@@ -93,14 +92,14 @@ class UdpDnsForwarder(
         pkt[10] = 0; pkt[11] = 0    // checksum placeholder
         srcIp.copyInto(pkt, 12)
         dstIp.copyInto(pkt, 16)
-        val ipCsum = checksum(pkt, 0, ipLen)
+        val ipCsum = checksum(pkt, ipLen)
         pkt[10] = (ipCsum shr 8).toByte()
         pkt[11] = (ipCsum and 0xFF).toByte()
 
         // UDP header
         val u = ipLen
-        pkt[u]     = (srcPort shr 8).toByte()
-        pkt[u + 1] = (srcPort and 0xFF).toByte()
+        pkt[u]     = (DNS_PORT shr 8).toByte()
+        pkt[u + 1] = (DNS_PORT and 0xFF).toByte()
         pkt[u + 2] = (dstPort shr 8).toByte()
         pkt[u + 3] = (dstPort and 0xFF).toByte()
         val udpTotal = udpLen + payload.size
@@ -116,10 +115,10 @@ class UdpDnsForwarder(
         return pkt
     }
 
-    private fun checksum(data: ByteArray, offset: Int, length: Int): Int {
-        var sum = 0; var i = offset; val end = offset + length
-        while (i < end - 1) { sum += ((data[i].toInt() and 0xFF) shl 8) or (data[i + 1].toInt() and 0xFF); i += 2 }
-        if (i < end) sum += (data[i].toInt() and 0xFF) shl 8
+    private fun checksum(data: ByteArray, length: Int): Int {
+        var sum = 0; var i = 0
+        while (i < length - 1) { sum += ((data[i].toInt() and 0xFF) shl 8) or (data[i + 1].toInt() and 0xFF); i += 2 }
+        if (i < length) sum += (data[i].toInt() and 0xFF) shl 8
         while (sum shr 16 != 0) sum = (sum and 0xFFFF) + (sum shr 16)
         return sum.inv() and 0xFFFF
     }
@@ -131,6 +130,6 @@ class UdpDnsForwarder(
         pseudo[10] = (udpLength shr 8).toByte(); pseudo[11] = (udpLength and 0xFF).toByte()
         pkt.copyInto(pseudo, 12, udpOffset, udpOffset + udpLength)
         pseudo[12 + 6] = 0; pseudo[12 + 7] = 0
-        return checksum(pseudo, 0, pseudo.size)
+        return checksum(pseudo, pseudo.size)
     }
 }

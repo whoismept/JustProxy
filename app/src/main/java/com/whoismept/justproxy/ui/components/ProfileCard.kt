@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import com.whoismept.justproxy.data.ProxyProfile
 import com.whoismept.justproxy.data.ProxyType
 
+@Suppress("UNUSED_VALUE")
 @Composable
 fun ProfileCard(
     profile  : ProxyProfile,

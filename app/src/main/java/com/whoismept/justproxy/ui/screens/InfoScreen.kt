@@ -104,14 +104,14 @@ fun InfoScreen() {
                     Text(s.infoOpenSource, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.height(10.dp))
-                LicenseEntry("Jetpack Compose",           "Apache 2.0", "Google")
-                LicenseEntry("Compose Material3",         "Apache 2.0", "Google")
-                LicenseEntry("Compose Material Icons",    "Apache 2.0", "Google")
-                LicenseEntry("AndroidX Core KTX",         "Apache 2.0", "Google")
-                LicenseEntry("AndroidX Lifecycle",        "Apache 2.0", "Google")
-                LicenseEntry("AndroidX Activity Compose", "Apache 2.0", "Google")
-                LicenseEntry("Room",                      "Apache 2.0", "Google / Jetpack")
-                LicenseEntry("Kotlin Coroutines",         "Apache 2.0", "JetBrains")
+                LicenseEntry("Jetpack Compose",           "Google")
+                LicenseEntry("Compose Material3",         "Google")
+                LicenseEntry("Compose Material Icons",    "Google")
+                LicenseEntry("AndroidX Core KTX",         "Google")
+                LicenseEntry("AndroidX Lifecycle",        "Google")
+                LicenseEntry("AndroidX Activity Compose", "Google")
+                LicenseEntry("Room",                      "Google / Jetpack")
+                LicenseEntry("Kotlin Coroutines",         "JetBrains")
             }
         }
 
@@ -128,7 +128,7 @@ fun InfoScreen() {
 }
 
 @Composable
-private fun LicenseEntry(name: String, license: String, author: String) {
+private fun LicenseEntry(name: String, author: String) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -142,7 +142,7 @@ private fun LicenseEntry(name: String, license: String, author: String) {
             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
         ) {
             Text(
-                license,
+                "Apache 2.0",
                 modifier   = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
                 style      = MaterialTheme.typography.labelSmall,
                 color      = MaterialTheme.colorScheme.primary,

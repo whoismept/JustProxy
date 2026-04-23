@@ -23,6 +23,7 @@ import com.whoismept.justproxy.ui.ProxyViewModel
 import com.whoismept.justproxy.ui.components.ProfileCard
 import com.whoismept.justproxy.ui.components.ProxyEditDialog
 
+@Suppress("UNUSED_VALUE")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfilesScreen(

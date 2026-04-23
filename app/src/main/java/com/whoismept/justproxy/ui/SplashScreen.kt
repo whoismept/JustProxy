@@ -25,7 +25,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.whoismept.justproxy.data.ProxyMode
-import com.whoismept.justproxy.ui.LocalStrings
 import com.whoismept.justproxy.utils.RootHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

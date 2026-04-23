@@ -13,7 +13,7 @@ object ProxyClient {
                 ProxyType.SOCKS4 -> socks4(socket, destIp, destPort)
                 ProxyType.HTTP   -> httpConnect(socket, destIp, destPort)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }

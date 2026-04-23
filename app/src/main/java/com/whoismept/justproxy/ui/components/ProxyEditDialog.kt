@@ -35,6 +35,7 @@ private val PROFILE_ICONS = listOf(
     "🏠", "💎", "🚀", "🎯", "🔵", "🔴", "🟢", "🟡"
 )
 
+@Suppress("UNUSED_VALUE")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProxyEditDialog(

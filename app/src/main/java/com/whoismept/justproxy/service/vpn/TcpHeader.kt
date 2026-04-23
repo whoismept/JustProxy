@@ -15,7 +15,6 @@ data class TcpHeader(
     val isAck get() = (flags and FLAG_ACK) != 0
     val isFin get() = (flags and FLAG_FIN) != 0
     val isRst get() = (flags and FLAG_RST) != 0
-    val isPsh get() = (flags and FLAG_PSH) != 0
 
     companion object {
         const val FLAG_FIN = 0x01

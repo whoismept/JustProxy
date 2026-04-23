@@ -54,7 +54,7 @@ fun LogScreen(viewModel: ProxyViewModel) {
                         IconButton(onClick = {
                             val count = logs.size
                             viewModel.clearLogs()
-                            expandedIds = emptySet()
+                            if (expandedIds.isNotEmpty()) expandedIds = emptySet()
                             scope.launch {
                                 iconRotation.animateTo(
                                     targetValue  = 360f,
