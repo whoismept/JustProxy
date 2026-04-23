@@ -1,5 +1,6 @@
 package com.whoismept.justproxy.ui
 
+import android.app.Activity
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.History
@@ -12,6 +13,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import com.whoismept.justproxy.data.ProxyMode
 import com.whoismept.justproxy.data.ProxyProfile
 import com.whoismept.justproxy.ui.screens.InfoScreen
@@ -19,11 +22,11 @@ import com.whoismept.justproxy.ui.screens.LogScreen
 import com.whoismept.justproxy.ui.screens.ProfilesScreen
 import com.whoismept.justproxy.ui.screens.SettingsScreen
 
-sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
-    object Profiles : Screen("profiles", "Profiles", Icons.AutoMirrored.Filled.List)
-    object Log      : Screen("log",      "Log",      Icons.Default.History)
-    object Settings : Screen("settings", "Settings", Icons.Default.Settings)
-    object Info     : Screen("info",     "About",    Icons.Default.Info)
+sealed class Screen(val icon: ImageVector) {
+    object Profiles : Screen(Icons.AutoMirrored.Filled.List)
+    object Log      : Screen(Icons.Default.History)
+    object Settings : Screen(Icons.Default.Settings)
+    object Info     : Screen(Icons.Default.Info)
 }
 
 @Composable
@@ -35,15 +38,18 @@ fun MainNavigationScreen(
     proxyMode: ProxyMode,
     persistentNotification: Boolean,
     showLogTab: Boolean,
+    language: String,
     onThemeToggle: (Boolean) -> Unit,
     onAccentChange: (Color) -> Unit,
     onShowSystemAppsToggle: (Boolean) -> Unit,
     onProxyModeChange: (ProxyMode) -> Unit,
     onPersistentNotificationToggle: (Boolean) -> Unit,
     onShowLogTabToggle: (Boolean) -> Unit,
+    onLanguageChange: (String) -> Unit,
     onStartProxy: (ProxyProfile) -> Unit,
     onStopProxy: () -> Unit
 ) {
+    val s = LocalStrings.current
     var current by remember { mutableStateOf<Screen>(Screen.Profiles) }
     val items = remember(showLogTab) {
         if (showLogTab) listOf(Screen.Profiles, Screen.Log, Screen.Settings)
@@ -54,8 +60,8 @@ fun MainNavigationScreen(
             NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
                 items.forEach { screen ->
                     NavigationBarItem(
-                        icon     = { Icon(screen.icon, contentDescription = screen.title) },
-                        label    = { Text(screen.title) },
+                        icon     = { Icon(screen.icon, contentDescription = null) },
+                        label    = { Text(screenLabel(screen, s)) },
                         selected = current == screen,
                         onClick  = { current = screen }
                     )
@@ -74,13 +80,15 @@ fun MainNavigationScreen(
                     showSystemApps                 = showSystemApps,
                     proxyMode                      = proxyMode,
                     persistentNotification         = persistentNotification,
+                    showLogTab                     = showLogTab,
+                    language                       = language,
                     onThemeToggle                  = onThemeToggle,
                     onAccentChange                 = onAccentChange,
                     onShowSystemAppsToggle         = onShowSystemAppsToggle,
                     onProxyModeChange              = onProxyModeChange,
                     onPersistentNotificationToggle = onPersistentNotificationToggle,
-                    showLogTab                     = showLogTab,
-                    onShowLogTabToggle             = onShowLogTabToggle
+                    onShowLogTabToggle             = onShowLogTabToggle,
+                    onLanguageChange               = onLanguageChange
                 )
                 Screen.Info     -> InfoScreen()
             }
@@ -88,8 +96,25 @@ fun MainNavigationScreen(
     }
 }
 
+private fun screenLabel(screen: Screen, s: AppStrings) = when (screen) {
+    Screen.Profiles -> s.navProfiles
+    Screen.Log      -> s.navLog
+    Screen.Settings -> s.navSettings
+    Screen.Info     -> s.navAbout
+}
+
 @Composable
 fun JustProxyTheme(isDarkMode: Boolean, accentColor: Color, content: @Composable () -> Unit) {
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            WindowCompat.getInsetsController(window, view).apply {
+                isAppearanceLightStatusBars     = !isDarkMode
+                isAppearanceLightNavigationBars = !isDarkMode
+            }
+        }
+    }
     MaterialTheme(
         colorScheme = buildAccentColorScheme(accentColor, isDarkMode),
         content     = content

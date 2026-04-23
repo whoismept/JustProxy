@@ -19,13 +19,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.whoismept.justproxy.data.ProxyMode
 import com.whoismept.justproxy.data.ProxyProfile
 import com.whoismept.justproxy.service.ProxyService
 import com.whoismept.justproxy.service.ProxyVpnService
+import androidx.compose.runtime.CompositionLocalProvider
 import com.whoismept.justproxy.ui.*
-import com.whoismept.justproxy.ui.screens.ProfilesScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -36,7 +37,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val context = LocalContext.current
-            val prefs   = remember { context.getSharedPreferences("settings", Context.MODE_PRIVATE) }
+            val prefs   = remember { context.getSharedPreferences("settings", MODE_PRIVATE) }
 
             var isDarkMode              by remember { mutableStateOf(prefs.getBoolean("dark_mode", true)) }
             var accentColor             by remember { mutableStateOf(Color(prefs.getInt("accent_color", Color(0xFFBB86FC).toArgb()))) }
@@ -47,6 +48,7 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf(ProxyMode.valueOf(prefs.getString("proxy_mode", ProxyMode.ROOT.name) ?: ProxyMode.ROOT.name))
             }
             var showSplash by remember { mutableStateOf(prefs.getBoolean("first_run", true)) }
+            var language   by remember { mutableStateOf(prefs.getString("language", "en") ?: "en") }
 
             val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
@@ -64,11 +66,12 @@ class MainActivity : ComponentActivity() {
             }
 
             JustProxyTheme(isDarkMode = isDarkMode, accentColor = accentColor) {
+                CompositionLocalProvider(LocalStrings provides stringsForLanguage(language)) {
                 Surface(color = MaterialTheme.colorScheme.background) {
                     if (showSplash) {
                         SplashScreen { mode ->
                             proxyMode = mode
-                            prefs.edit().putString("proxy_mode", mode.name).putBoolean("first_run", false).apply()
+                            prefs.edit { putString("proxy_mode", mode.name); putBoolean("first_run", false) }
                             showSplash = false
                         }
                     } else {
@@ -81,13 +84,15 @@ class MainActivity : ComponentActivity() {
                             showSystemApps                 = showSystemApps,
                             proxyMode                      = proxyMode,
                             persistentNotification         = persistentNotification,
-                            onThemeToggle                  = { isDarkMode = it;  prefs.edit().putBoolean("dark_mode", it).apply() },
-                            onAccentChange                 = { accentColor = it; prefs.edit().putInt("accent_color", it.toArgb()).apply() },
-                            onShowSystemAppsToggle         = { showSystemApps = it; prefs.edit().putBoolean("show_system_apps", it).apply() },
-                            onProxyModeChange              = { proxyMode = it;  prefs.edit().putString("proxy_mode", it.name).apply() },
-                            onPersistentNotificationToggle = { persistentNotification = it; prefs.edit().putBoolean("persistent_notification", it).apply() },
+                            onThemeToggle                  = { isDarkMode = it;  prefs.edit { putBoolean("dark_mode", it) } },
+                            onAccentChange                 = { accentColor = it; prefs.edit { putInt("accent_color", it.toArgb()) } },
+                            onShowSystemAppsToggle         = { showSystemApps = it; prefs.edit { putBoolean("show_system_apps", it) } },
+                            onProxyModeChange              = { proxyMode = it;  prefs.edit { putString("proxy_mode", it.name) } },
+                            onPersistentNotificationToggle = { persistentNotification = it; prefs.edit { putBoolean("persistent_notification", it) } },
                             showLogTab                     = showLogTab,
-                            onShowLogTabToggle             = { showLogTab = it; prefs.edit().putBoolean("show_log_tab", it).apply() },
+                            language                       = language,
+                            onShowLogTabToggle             = { showLogTab = it; prefs.edit { putBoolean("show_log_tab", it) } },
+                            onLanguageChange               = { language = it; prefs.edit { putString("language", it) } },
                             onStartProxy                   = { profile ->
                                 if (proxyMode == ProxyMode.ROOT) {
                                     ProxyService.startService(context, profile, persistentNotification)
@@ -108,6 +113,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
+                } // CompositionLocalProvider
             }
         }
     }

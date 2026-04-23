@@ -28,6 +28,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.whoismept.justproxy.data.ConnectionLog
 import com.whoismept.justproxy.data.ConnectionStatus
+import com.whoismept.justproxy.ui.LocalStrings
 import com.whoismept.justproxy.ui.ProxyViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -35,6 +36,7 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogScreen(viewModel: ProxyViewModel) {
+    val s            = LocalStrings.current
     val logs        by viewModel.connectionLogs.collectAsState()
     val timeFmt      = remember { SimpleDateFormat("HH:mm:ss", Locale.getDefault()) }
     val dateFmt      = remember { SimpleDateFormat("HH:mm:ss · dd MMM yyyy", Locale.getDefault()) }
@@ -46,7 +48,7 @@ fun LogScreen(viewModel: ProxyViewModel) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Traffic Log", fontWeight = FontWeight.ExtraBold) },
+                title = { Text(s.logTitle, fontWeight = FontWeight.ExtraBold) },
                 actions = {
                     if (logs.isNotEmpty()) {
                         IconButton(onClick = {
@@ -62,12 +64,12 @@ fun LogScreen(viewModel: ProxyViewModel) {
                             }
                             scope.launch {
                                 delay(1_000)
-                                Toast.makeText(context, "$count log cleared", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, s.logClearedToast(count), Toast.LENGTH_SHORT).show()
                             }
                         }) {
                             Icon(
                                 Icons.Default.ClearAll,
-                                contentDescription = "Clear log",
+                                contentDescription = s.logClearDesc,
                                 modifier = Modifier.rotate(iconRotation.value)
                             )
                         }
@@ -162,10 +164,10 @@ private fun LogEntryCard(
                         }
                     }
                     if (log.alertCode >= 0) {
-                        DetailRow(label = "TLS Alert", value = "${tlsAlertName(log.alertCode)} (${log.alertCode})")
+                        DetailRow(label = LocalStrings.current.logDetailTlsAlert, value = "${tlsAlertName(log.alertCode)} (${log.alertCode})")
                     }
-                    DetailRow(label = "Time",     value = dateFmt.format(Date(log.timestamp)))
-                    DetailRow(label = "Duration", value = "${log.durationMs} ms")
+                    DetailRow(label = LocalStrings.current.logDetailTime,     value = dateFmt.format(Date(log.timestamp)))
+                    DetailRow(label = LocalStrings.current.logDetailDuration, value = "${log.durationMs} ms")
                 }
             }
         }
@@ -255,6 +257,7 @@ private fun tlsAlertName(code: Int) = when (code) {
 
 @Composable
 private fun LogEmptyState(modifier: Modifier = Modifier) {
+    val s = LocalStrings.current
     Column(
         modifier             = modifier.fillMaxSize(),
         verticalArrangement  = Arrangement.Center,
@@ -262,9 +265,9 @@ private fun LogEmptyState(modifier: Modifier = Modifier) {
     ) {
         Icon(Icons.Default.Timeline, contentDescription = null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.outline)
         Spacer(modifier = Modifier.height(8.dp))
-        Text("No Traffic Yet", color = MaterialTheme.colorScheme.outline)
+        Text(s.logEmptyTitle, color = MaterialTheme.colorScheme.outline)
         Text(
-            "Connections will appear here once the proxy is active",
+            s.logEmptySubtitle,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.outline
         )

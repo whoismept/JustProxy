@@ -1,7 +1,6 @@
 package com.whoismept.justproxy.ui.screens
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,16 +16,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.core.net.toUri
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.whoismept.justproxy.R
+import com.whoismept.justproxy.ui.LocalStrings
 import com.whoismept.justproxy.utils.RootHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
 fun InfoScreen() {
+    val s          = LocalStrings.current
     val context    = LocalContext.current
     var isRooted   by remember { mutableStateOf<Boolean?>(null) }
 
@@ -54,11 +56,11 @@ fun InfoScreen() {
         Spacer(modifier = Modifier.height(28.dp))
 
         InfoRow(
-            title = "Root Access",
+            title = s.infoRootAccess,
             value = when (isRooted) {
-                true  -> "Granted"
-                false -> "Denied"
-                null  -> "Checking…"
+                true  -> s.infoRootGranted
+                false -> s.infoRootDenied
+                null  -> s.infoRootChecking
             },
             icon  = Icons.Default.VerifiedUser,
             color = when (isRooted) {
@@ -72,7 +74,7 @@ fun InfoScreen() {
 
         Surface(
             modifier = Modifier.fillMaxWidth().clickable {
-                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/whoismept/justproxy")))
+                context.startActivity(Intent(Intent.ACTION_VIEW, "https://github.com/whoismept/justproxy".toUri()))
             },
             shape = RoundedCornerShape(16.dp),
             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
@@ -81,7 +83,7 @@ fun InfoScreen() {
                 Icon(Icons.Default.Code, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
-                    Text("Developer", style = MaterialTheme.typography.labelLarge)
+                    Text(s.infoDeveloper, style = MaterialTheme.typography.labelLarge)
                     Text("whoismept", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Text("github.com/whoismept/justproxy", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                 }
@@ -99,7 +101,7 @@ fun InfoScreen() {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Balance, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text("Open Source Libraries", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                    Text(s.infoOpenSource, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 LicenseEntry("Jetpack Compose",           "Apache 2.0", "Google")
@@ -117,7 +119,7 @@ fun InfoScreen() {
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            "Designed for security research and network debugging.\nUse responsibly.",
+            s.infoFooter,
             style     = MaterialTheme.typography.labelSmall,
             textAlign = TextAlign.Center,
             color     = MaterialTheme.colorScheme.outline

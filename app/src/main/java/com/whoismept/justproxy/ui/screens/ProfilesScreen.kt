@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.whoismept.justproxy.data.ProxyMode
 import com.whoismept.justproxy.data.ProxyProfile
+import com.whoismept.justproxy.ui.LocalStrings
 import com.whoismept.justproxy.ui.ProxyViewModel
 import com.whoismept.justproxy.ui.components.ProfileCard
 import com.whoismept.justproxy.ui.components.ProxyEditDialog
@@ -32,6 +33,7 @@ fun ProfilesScreen(
     onStopProxy: () -> Unit,
     onAboutClick: () -> Unit
 ) {
+    val s = LocalStrings.current
     val profiles by viewModel.allProfiles.collectAsState()
     var editTarget by remember { mutableStateOf<ProxyProfile?>(null) }
     var showAddDialog by remember { mutableStateOf(false) }
@@ -43,7 +45,7 @@ fun ProfilesScreen(
                 navigationIcon = { ModeBadge(proxyMode) },
                 actions        = {
                     IconButton(onClick = onAboutClick) {
-                        Icon(Icons.Default.Info, contentDescription = "About", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Icon(Icons.Default.Info, contentDescription = s.navAbout, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
@@ -51,7 +53,7 @@ fun ProfilesScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { showAddDialog = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Add profile")
+                Icon(Icons.Default.Add, contentDescription = s.addProfile)
             }
         }
     ) { padding ->
@@ -141,6 +143,7 @@ private fun ModeBadge(mode: ProxyMode) {
 
 @Composable
 fun EmptyState() {
+    val s = LocalStrings.current
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -148,7 +151,7 @@ fun EmptyState() {
     ) {
         Icon(Icons.Default.CloudQueue, contentDescription = null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.outline)
         Spacer(modifier = Modifier.height(8.dp))
-        Text("No Profiles Yet", color = MaterialTheme.colorScheme.outline)
-        Text("Tap + to create one", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
+        Text(s.noProfilesTitle, color = MaterialTheme.colorScheme.outline)
+        Text(s.noProfilesSubtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
     }
 }

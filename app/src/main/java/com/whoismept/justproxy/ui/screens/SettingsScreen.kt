@@ -1,6 +1,5 @@
 package com.whoismept.justproxy.ui.screens
 
-import android.widget.Toast
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -22,10 +21,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.whoismept.justproxy.data.ProxyMode
+import com.whoismept.justproxy.ui.LocalStrings
 import com.whoismept.justproxy.ui.ProxyViewModel
 import kotlinx.coroutines.launch
 
@@ -40,6 +39,8 @@ private val ACCENT_COLORS = listOf(
     Color(0xFF9C27B0)
 )
 
+private val LANGUAGES = listOf("en" to "English", "tr" to "Türkçe")
+
 @Composable
 fun SettingsScreen(
     viewModel: ProxyViewModel,
@@ -49,13 +50,17 @@ fun SettingsScreen(
     proxyMode: ProxyMode,
     persistentNotification: Boolean,
     showLogTab: Boolean,
+    language: String,
     onThemeToggle: (Boolean) -> Unit,
     onAccentChange: (Color) -> Unit,
     onShowSystemAppsToggle: (Boolean) -> Unit,
     onProxyModeChange: (ProxyMode) -> Unit,
     onPersistentNotificationToggle: (Boolean) -> Unit,
-    onShowLogTabToggle: (Boolean) -> Unit
+    onShowLogTabToggle: (Boolean) -> Unit,
+    onLanguageChange: (String) -> Unit
 ) {
+    val s = LocalStrings.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -64,15 +69,16 @@ fun SettingsScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         // ── Appearance ───────────────────────────────────────────────────────
-        SettingsCard(title = "Appearance", icon = Icons.Default.Palette) {
+        SettingsCard(title = s.settingsAppearance, icon = Icons.Default.Palette) {
             SettingsToggle(
-                title       = "Dark Mode",
-                description = "Switch between light and dark theme",
+                title       = s.settingsDarkMode,
+                description = s.settingsDarkModeDesc,
                 checked     = isDarkMode,
                 onChecked   = onThemeToggle
             )
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
-                "Accent Color",
+                s.settingsAccentColor,
                 style      = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium
             )
@@ -106,40 +112,63 @@ fun SettingsScreen(
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                s.settingsLanguage,
+                style      = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium
+            )
+            Text(
+                s.settingsLanguageDesc,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.outline
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                LANGUAGES.forEach { (code, name) ->
+                    FilterChip(
+                        selected    = language == code,
+                        onClick     = { onLanguageChange(code) },
+                        label       = { Text(name) },
+                        leadingIcon = {
+                            if (language == code) Icon(Icons.Default.Check, null, Modifier.size(18.dp))
+                        }
+                    )
+                }
+            }
         }
 
-        // ── Notifications ────────────────────────────────────────────────────
-        SettingsCard(title = "Advanced", icon = Icons.Default.Notifications) {
+        // ── Advanced ─────────────────────────────────────────────────────────
+        SettingsCard(title = s.settingsAdvanced, icon = Icons.Default.Notifications) {
             SettingsToggle(
-                title       = "Persistent Notification",
-                description = "Keep proxy notification pinned — prevents accidental dismissal",
+                title       = s.settingsPersistentNotif,
+                description = s.settingsPersistentNotifDesc,
                 checked     = persistentNotification,
                 onChecked   = onPersistentNotificationToggle
             )
             SettingsToggle(
-                title       = "Traffic Log Tab",
-                description = "Show the Log tab in the navigation bar",
+                title       = s.settingsLogTab,
+                description = s.settingsLogTabDesc,
                 checked     = showLogTab,
                 onChecked   = onShowLogTabToggle
             )
             SettingsToggle(
-                title       = "Show System Apps",
-                description = "Include system apps in the app picker",
+                title       = s.settingsSystemApps,
+                description = s.settingsSystemAppsDesc,
                 checked     = showSystemApps,
                 onChecked   = onShowSystemAppsToggle
             )
         }
 
         // ── Proxy ────────────────────────────────────────────────────────────
-        SettingsCard(title = "Proxy", icon = Icons.Default.Bolt) {
+        SettingsCard(title = s.settingsProxy, icon = Icons.Default.Bolt) {
             Text(
-                "Interception Mode",
+                s.settingsInterceptionMode,
                 style      = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium
             )
             Text(
-                if (proxyMode == ProxyMode.ROOT) "Root — iptables DNAT, no battery overhead"
-                else                             "VPN — works without root, uses Android VpnService",
+                if (proxyMode == ProxyMode.ROOT) s.settingsRootModeDesc else s.settingsVpnModeDesc,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.outline
             )
@@ -176,7 +205,7 @@ fun SettingsScreen(
                     Icon(Icons.Default.Science, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        "Experimental",
+                        s.settingsExperimental,
                         style      = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color      = MaterialTheme.colorScheme.error
@@ -184,7 +213,7 @@ fun SettingsScreen(
                 }
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    "Use this if traffic is broken after stopping a proxy session.",
+                    s.settingsExperimentalDesc,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -204,13 +233,13 @@ fun SettingsScreen(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors   = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
-                    border   = ButtonDefaults.outlinedButtonBorder.copy(
+                    border   = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
                         brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error.copy(alpha = 0.5f))
                     )
                 ) {
                     Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(18.dp).rotate(refreshRotation.value))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Flush Proxy & Reset Network")
+                    Text(s.settingsFlushButton)
                 }
             }
         }

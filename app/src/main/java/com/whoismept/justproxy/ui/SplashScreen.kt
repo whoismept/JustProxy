@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.whoismept.justproxy.data.ProxyMode
+import com.whoismept.justproxy.ui.LocalStrings
 import com.whoismept.justproxy.utils.RootHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -55,40 +56,42 @@ fun SplashScreen(onFinish: (ProxyMode) -> Unit) {
 
 @Composable
 private fun WelcomeStep(onNext: () -> Unit) {
+    val s = LocalStrings.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(24.dp)
     ) {
         Icon(painterResource(R.drawable.ic_launcher_foreground), null, modifier = Modifier.size(120.dp), tint = Color.Unspecified)
         Spacer(modifier = Modifier.height(24.dp))
-        Text("Welcome to JustProxy", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-        Text("Advanced network debugging for everyone", style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
+        Text(s.splashWelcome, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+        Text(s.splashSubtitle, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
         Spacer(modifier = Modifier.height(48.dp))
         Button(
             onClick = onNext,
             modifier = Modifier.fillMaxWidth().height(56.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
-            Text("Get Started", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(s.splashGetStarted, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
 
 @Composable
 private fun ModeSelectStep(rootAvailable: Boolean?, onFinish: (ProxyMode) -> Unit) {
+    val s = LocalStrings.current
     Column(
         modifier = Modifier.padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("System Check", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+        Text(s.splashSystemCheck, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
 
         StatusRow(
-            title = "Root Access",
+            title = s.splashRootAccess,
             status = when (rootAvailable) {
-                true  -> "Found"
-                false -> "Not Found"
-                null  -> "Checking..."
+                true  -> s.splashRootFound
+                false -> s.splashRootNotFound
+                null  -> s.splashChecking
             },
             icon  = if (rootAvailable == true) Icons.Default.CheckCircle else Icons.Default.Cancel,
             color = when (rootAvailable) {
@@ -99,20 +102,20 @@ private fun ModeSelectStep(rootAvailable: Boolean?, onFinish: (ProxyMode) -> Uni
         )
 
         Spacer(modifier = Modifier.height(32.dp))
-        Text("Select Operation Mode", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(s.splashSelectMode, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
 
         ModeCard(
-            title = "Root Mode",
-            description = "Transparent proxying via iptables. Requires root access.",
+            title = s.splashRootMode,
+            description = s.splashRootModeDesc,
             icon = Icons.Default.Bolt,
             enabled = rootAvailable == true,
             onClick = { onFinish(ProxyMode.ROOT) }
         )
         Spacer(modifier = Modifier.height(16.dp))
         ModeCard(
-            title = "VPN Mode",
-            description = "Capture traffic via VpnService. No root required.",
+            title = s.splashVpnMode,
+            description = s.splashVpnModeDesc,
             icon = Icons.Default.VpnLock,
             enabled = true,
             onClick = { onFinish(ProxyMode.VPN) }
