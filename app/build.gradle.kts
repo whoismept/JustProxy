@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.proxydegil.proxyapp"
+    namespace = "com.whoismept.justproxy"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.proxydegil.proxyapp"
+        applicationId = "com.whoismept.justproxy"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
